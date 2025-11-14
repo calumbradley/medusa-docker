@@ -8,6 +8,15 @@ This guide shows how to tag and push your Medusa Docker images to AWS Elastic Co
 - AWS CLI configured with appropriate credentials
 - ECR repository created in AWS
 
+## Build Docker Image for AMD64 (x86_64)
+
+Build the image for the correct architecture to run on AWS EC2 instances:
+
+```bash
+# Build for AMD64 architecture (required for EC2 x86_64 instances)
+docker buildx build --platform linux/amd64 -t medusa-app:server .
+```
+
 ## Authenticate with ECR
 
 First, authenticate Docker to your ECR registry:
