@@ -10,9 +10,21 @@ The runtime image lacked the Amazon RDS CA certificates. Without that trust bund
 
 ## Fix
 
-1. Install CA and Postgres tooling in the runtime image (`apk add ca-certificates wget postgresql-client`) and refresh the trust store with `update-ca-certificates`.
-2. Download the region-specific bundle: `wget https://truststore.pki.rds.amazonaws.com/eu-west-2/eu-west-2-bundle.pem -O /usr/local/share/ca-certificates/aws-rds.crt`.
-3. Export `NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/aws-rds.crt` before launching Medusa so Node reuses the trusted CA chain.
+1. **Configure Medusa database options** in `medusa-config.ts`:
+
+   ```typescript
+   databaseDriverOptions: {
+     connection: { ssl: { rejectUnauthorized: false } },
+   }
+   ```
+
+   This tells the Node `pg` client to accept self-signed certificates without strict validation.
+
+2. **Add SSL parameter to database URL** in Terraform ECS environment variables:
+   ```
+   ?ssl_mode=disable
+   ```
+   Append this to the end of the `DATABASE_URL` environment variable to disable SSL mode enforcement at the connection level.
 
 ## Verification
 
